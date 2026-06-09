@@ -5,11 +5,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BizTool - Προσφορές & Αποδείξεις</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <style>
+        /* CSS ΓΙΑ ΤΗΝ ΕΚΤΥΠΩΣΗ / ΑΠΟΘΗΚΕΥΣΗ ΣΕ PDF */
+        @media print {
+            /* Κρύβουμε τα πάντα στην οθόνη (φόρμες, κουμπιά, modal) */
+            body * {
+                visibility: hidden;
+            }
+            /* Εμφανίζουμε ΜΟΝΟ το template του PDF */
+            #printTemplate, #printTemplate * {
+                visibility: visible;
+            }
+            /* Τοποθετούμε το template στην κορυφή της σελίδας εκτύπωσης */
+            #printTemplate {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                display: block !important;
+            }
+            /* Αφαιρούμε background elements που δεν χρειάζονται */
+            body {
+                background-color: white;
+            }
+        }
+    </style>
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans antialiased pb-12">
 
-    <div class="max-w-md mx-auto px-4 pt-6">
+    <div id="mainApp" class="max-w-md mx-auto px-4 pt-6">
         <header class="flex justify-between items-center mb-6">
             <h1 class="text-2xl font-bold text-indigo-600">BizTool 🛠️</h1>
             <button onclick="toggleSetup()" class="text-sm bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-1 px-3 rounded-lg transition cursor-pointer">
@@ -74,8 +99,8 @@
             </div>
             
             <div class="space-y-2 pt-2">
-                <button id="downloadPdfBtn" onclick="downloadPDF()" class="w-full bg-gray-800 text-white font-medium py-2.5 rounded-lg text-sm flex justify-center items-center gap-2 cursor-pointer">
-                    📥 Κατέβασμα PDF στο κινητό
+                <button onclick="triggerPrint()" class="w-full bg-gray-800 text-white font-medium py-2.5 rounded-lg text-sm flex justify-center items-center gap-2 cursor-pointer">
+                    📥 Κατέβασμα PDF / Εκτύπωση
                 </button>
                 <button id="modalWaBtn" onclick="sendWhatsApp()" class="w-full bg-emerald-600 text-white font-medium py-2.5 rounded-lg text-sm flex justify-center items-center gap-2 cursor-pointer">
                     💬 Αποστολή μέσω WhatsApp
@@ -94,35 +119,33 @@
         </div>
     </div>
 
-    <div style="position: absolute; left: -9999px; top: 0; width: 650px;">
-        <div id="pdfTemplate" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; padding: 40px; background-color: white; color: black; line-height: 1.5;">
-            <div style="display: flex; justify-content: space-between; border-b: 2px solid #4f46e5; padding-bottom: 20px; margin-bottom: 25px;">
-                <div>
-                    <h1 id="pdfBizName" style="font-size: 24px; font-weight: bold; color: #4f46e5; margin: 0; font-family: Arial, sans-serif;"></h1>
-                    <p id="pdfBizPhone" style="margin: 6px 0 0 0; color: #444; font-size: 14px; font-family: Arial, sans-serif;"></p>
-                </div>
-                <div style="text-align: right;">
-                    <h2 id="pdfDocType" style="font-size: 20px; font-weight: bold; margin: 0; text-transform: uppercase; color: #222; font-family: Arial, sans-serif;"></h2>
-                    <p style="margin: 6px 0 0 0; color: #666; font-size: 13px; font-family: Arial, sans-serif;">Ημερομηνία: <span id="pdfDate"></span></p>
-                </div>
+    <div id="printTemplate" class="hidden p-8 bg-white text-black max-w-2xl mx-auto">
+        <div class="flex justify-between border-b-2 border-indigo-600 pb-4 mb-6">
+            <div>
+                <h1 id="pdfBizName" class="text-2xl font-bold text-indigo-600 m-0"></h1>
+                <p id="pdfBizPhone" class="mt-1 text-sm text-gray-600 m-0"></p>
             </div>
-            <div style="margin: 25px 0; font-family: Arial, sans-serif;">
-                <strong style="color: #444; font-size: 14px; text-transform: uppercase;">Προς τον Πελάτη:</strong>
-                <p id="pdfClientName" style="margin: 6px 0; font-size: 16px; font-weight: bold; color: #111;"></p>
+            <div class="text-right">
+                <h2 id="pdfDocType" class="text-xl font-bold uppercase m-0 text-gray-800"></h2>
+                <p class="mt-1 text-xs text-gray-500 m-0">Ημερομηνία: <span id="pdfDate"></span></p>
             </div>
-            <table style="width: 100%; border-collapse: collapse; margin-top: 25px; font-size: 14px; font-family: Arial, sans-serif;">
-                <thead>
-                    <tr style="background-color: #f8fafc; text-align: left;">
-                        <th style="padding: 12px 10px; border-bottom: 2px solid #e2e8f0; color: #334155; font-weight: bold;">Περιγραφή Εργασίας</th>
-                        <th style="padding: 12px 10px; border-bottom: 2px solid #e2e8f0; text-align: center; width: 60px; color: #334155; font-weight: bold;">Ποσ.</th>
-                        <th style="padding: 12px 10px; border-bottom: 2px solid #e2e8f0; text-align: right; width: 110px; color: #334155; font-weight: bold;">Τιμή</th>
-                    </tr>
-                </thead>
-                <tbody id="pdfTableBody"></tbody>
-            </table>
-            <div style="text-align: right; margin-top: 35px; font-size: 18px; font-weight: bold; border-top: 2px solid #1e293b; padding-top: 15px; color: #0f172a; font-family: Arial, sans-serif;">
-                Γενικό Σύνολο: <span id="pdfTotal"></span>
-            </div>
+        </div>
+        <div class="my-6">
+            <strong class="text-xs uppercase text-gray-500 block tracking-wider">Προς τον Πελάτη:</strong>
+            <p id="pdfClientName" class="text-lg font-bold text-gray-900 mt-1 m-0"></p>
+        </div>
+        <table class="w-full border-collapse mt-6 text-sm">
+            <thead>
+                <tr class="bg-gray-50 text-left">
+                    <th class="p-3 border-b border-gray-200 text-gray-700 font-bold">Περιγραφή Εργασίας</th>
+                    <th class="p-3 border-b border-gray-200 text-center w-16 text-gray-700 font-bold">Ποσ.</th>
+                    <th class="p-3 border-b border-gray-200 text-right w-24 text-gray-700 font-bold">Τιμή</th>
+                </tr>
+            </thead>
+            <tbody id="pdfTableBody"></tbody>
+        </table>
+        <div class="text-right mt-8 text-lg font-bold border-top-2 border-gray-800 pt-4 text-gray-900">
+            Γενικό Σύνολο: <span id="pdfTotal" class="text-indigo-600"></span>
         </div>
     </div>
 
@@ -238,59 +261,40 @@
             document.getElementById('modalViberBtn').style.display = clientPhone ? 'block' : 'none';
             document.getElementById('modalEmailBtn').style.display = clientEmail ? 'block' : 'none';
 
-            document.getElementById('successModal').classList.remove('hidden');
-        }
-
-        function downloadPDF() {
-            const btn = document.getElementById('downloadPdfBtn');
-            const data = currentDocumentData;
-            
-            btn.innerText = "⏳ Παραγωγή PDF...";
-            btn.disabled = true;
-
+            // Προετοιμασία των στοιχείων εκτύπωσης από τώρα
             document.getElementById('pdfBizName').innerText = myBusiness.name || 'Επαγγελματίας';
             document.getElementById('pdfBizPhone').innerText = myBusiness.phone ? 'Τηλ: ' + myBusiness.phone : '';
-            document.getElementById('pdfDocType').innerText = data.docType;
+            document.getElementById('pdfDocType').innerText = docType;
             document.getElementById('pdfDate').innerText = new Date().toLocaleDateString('el-GR');
-            document.getElementById('pdfClientName').innerText = data.clientName;
+            document.getElementById('pdfClientName').innerText = clientName;
 
             const tbody = document.getElementById('pdfTableBody');
             tbody.innerHTML = '';
-            data.items.forEach(item => {
+            items.forEach(item => {
                 tbody.innerHTML += `
-                    <tr>
-                        <td style="padding: 10px; border-bottom: 1px solid #edf2f7; color: #2d3748;">${item.name}</td>
-                        <td style="padding: 10px; border-bottom: 1px solid #edf2f7; text-align: center; color: #2d3748;">${item.qty}</td>
-                        <td style="padding: 10px; border-bottom: 1px solid #edf2f7; text-align: right; color: #2d3748; font-weight: 500;">${item.total}€</td>
+                    <tr class="border-b border-gray-100">
+                        <td class="p-3 text-gray-800">${item.name}</td>
+                        <td class="p-3 text-center text-gray-600">${item.qty}</td>
+                        <td class="p-3 text-right text-gray-800 font-medium">${item.total}€</td>
                     </tr>
                 `;
             });
-            document.getElementById('pdfTotal').innerText = data.total + '€';
+            document.getElementById('pdfTotal').innerText = total + '€';
 
-            const element = document.getElementById('pdfTemplate');
+            document.getElementById('successModal').classList.remove('hidden');
+        }
+
+        // Η ΝΕΑ ΕΞΥΠΝΗ ΛΕΙΤΟΥΡΓΙΑ ΓΙΑ ΚΑΤΕΒΑΣΜΑ PDF
+        function triggerPrint() {
+            // Εμφανίζουμε προσωρινά το template για να το προλάβει ο browser
+            const template = document.getElementById('printTemplate');
+            template.classList.remove('hidden');
             
-            const opt = {
-                margin: [15, 15, 15, 15],
-                filename: `${data.docType}_${data.clientName.replace(/\s+/g, '_')}.pdf`,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { 
-                    scale: 2, 
-                    useCORS: true,
-                    logging: false,
-                    letterRendering: true
-                },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
-
-            html2pdf().set(opt).from(element).save().then(() => {
-                btn.innerText = "📥 Κατέβασμα PDF στο κινητό";
-                btn.disabled = false;
-            }).catch((err) => {
-                console.error("PDF Error: ", err);
-                alert("Υπήρξε ένα πρόβλημα κατά τη λήψη. Δοκιμάστε ξανά.");
-                btn.innerText = "📥 Κατέβασμα PDF στο κινητό";
-                btn.disabled = false;
-            });
+            // Ανοίγουμε το παράθυρο του συστήματος
+            window.print();
+            
+            // Ξανακρύβουμε το template μετά την εκτύπωση
+            template.classList.add('hidden');
         }
 
         function buildTextMessage(data) {
