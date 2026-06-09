@@ -20,17 +20,17 @@
         <div id="setupSection" class="hidden bg-white p-5 rounded-2xl shadow-sm border border-gray-100 mb-6">
             <h2 class="text-lg font-semibold mb-4 text-gray-900 border-b pb-2">Στοιχεία Επαγγελματία</h2>
             <div class="space-y-3 mb-4">
-                <input type="text" id="bizName" placeholder="Όνομα / Επωνυμία Επιχείρησης" class="w-full p-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
-                <input type="text" id="bizPhone" placeholder="Τηλέφωνο Επικοινωνίας" class="w-full p-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                <input type="text" id="bizName" placeholder="Όνομα / Επωνυμία Επιχείρησης" class="w-full p-2.5 border rounded-lg text-sm outline-none">
+                <input type="text" id="bizPhone" placeholder="Τηλέφωνο Επικοινωνίας" class="w-full p-2.5 border rounded-lg text-sm outline-none">
             </div>
 
             <h2 class="text-md font-semibold mb-2 text-gray-900">Οι Υπηρεσίες & Τιμές μου</h2>
             <div id="servicesSetupList" class="space-y-2 mb-3"></div>
-            <button onclick="addServiceField('', '')" class="w-full bg-gray-100 hover:bg-gray-200 text-indigo-600 text-xs font-semibold py-2 rounded-lg border border-dashed border-indigo-300 transition mb-4">
+            <button onclick="addServiceField('', '')" class="w-full bg-gray-100 text-indigo-600 text-xs font-semibold py-2 rounded-lg border border-dashed border-indigo-300 mb-4">
                 + Προσθήκη Νέας Υπηρεσίας
             </button>
 
-            <button onclick="saveSetup()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-lg text-sm transition shadow-sm">
+            <button onclick="saveSetup()" class="w-full bg-indigo-600 text-white font-medium py-2.5 rounded-lg text-sm shadow-sm">
                 Αποθήκευση Αλλαγών
             </button>
         </div>
@@ -39,9 +39,9 @@
             <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
                 <h2 class="text-md font-semibold mb-3 text-gray-900">Στοιχεία Πελάτη</h2>
                 <div class="space-y-3">
-                    <input type="text" id="clientName" placeholder="Όνομα Πελάτη" class="w-full p-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
-                    <input type="text" id="clientPhone" placeholder="Κινητό (για WhatsApp / Viber)" class="w-full p-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
-                    <input type="email" id="clientEmail" placeholder="Email Πελάτη - Προαιρετικό" class="w-full p-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                    <input type="text" id="clientName" placeholder="Όνομα Πελάτη" class="w-full p-2.5 border rounded-lg text-sm outline-none">
+                    <input type="text" id="clientPhone" placeholder="Κινητό (για WhatsApp / Viber)" class="w-full p-2.5 border rounded-lg text-sm outline-none">
+                    <input type="email" id="clientEmail" placeholder="Email Πελάτη - Προαιρετικό" class="w-full p-2.5 border rounded-lg text-sm outline-none">
                     
                     <div class="flex gap-4 pt-1">
                         <label class="flex items-center text-sm font-medium text-gray-700 cursor-pointer">
@@ -59,7 +59,7 @@
                 <div id="servicesSelectionList" class="space-y-3"></div>
             </div>
 
-            <button onclick="processDocument()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition shadow-md flex justify-center items-center gap-2 text-base">
+            <button onclick="processDocument()" class="w-full bg-indigo-600 text-white font-bold py-3 rounded-xl shadow-md text-base cursor-pointer">
                 🚀 Δημιουργία Έκδοσης
             </button>
         </main>
@@ -74,53 +74,55 @@
             </div>
             
             <div class="space-y-2 pt-2">
-                <button onclick="downloadPDF()" class="w-full bg-gray-800 hover:bg-gray-900 text-white font-medium py-2.5 rounded-lg text-sm transition flex justify-center items-center gap-2">
+                <button id="downloadPdfBtn" onclick="downloadPDF()" class="w-full bg-gray-800 text-white font-medium py-2.5 rounded-lg text-sm flex justify-center items-center gap-2 cursor-pointer">
                     📥 Κατέβασμα PDF στο κινητό
                 </button>
-                <button id="modalWaBtn" onclick="sendWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2.5 rounded-lg text-sm transition flex justify-center items-center gap-2">
+                <button id="modalWaBtn" onclick="sendWhatsApp()" class="w-full bg-emerald-600 text-white font-medium py-2.5 rounded-lg text-sm flex justify-center items-center gap-2 cursor-pointer">
                     💬 Αποστολή μέσω WhatsApp
                 </button>
-                <button id="modalViberBtn" onclick="sendViber()" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-2.5 rounded-lg text-sm transition flex justify-center items-center gap-2">
+                <button id="modalViberBtn" onclick="sendViber()" class="w-full bg-purple-600 text-white font-medium py-2.5 rounded-lg text-sm flex justify-center items-center gap-2 cursor-pointer">
                     💜 Αποστολή μέσω Viber
                 </button>
-                <button id="modalEmailBtn" onclick="sendMailClient()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-lg text-sm transition flex justify-center items-center gap-2">
+                <button id="modalEmailBtn" onclick="sendMailClient()" class="w-full bg-blue-600 text-white font-medium py-2.5 rounded-lg text-sm flex justify-center items-center gap-2 cursor-pointer">
                     ✉️ Αποστολή στο Email πελάτη
                 </button>
             </div>
 
-            <button onclick="closeModal()" class="w-full text-center text-xs text-gray-400 hover:text-gray-600 pt-2 block">
+            <button onclick="closeModal()" class="w-full text-center text-xs text-gray-400 hover:text-gray-600 pt-2 block cursor-pointer">
                 « Επιστροφή στην αρχική
             </button>
         </div>
     </div>
 
-    <div id="pdfTemplate" class="absolute left-[-9999px] bg-white p-8 text-black" style="width: 700px;">
-        <div style="display: flex; justify-content: space-between; border-b: 2px solid #4f46e5; padding-bottom: 15px;">
-            <div>
-                <h1 id="pdfBizName" style="font-size: 24px; font-weight: bold; color: #4f46e5; margin: 0;"></h1>
-                <p id="pdfBizPhone" style="margin: 5px 0 0 0; color: #555;"></p>
+    <div style="display: none;">
+        <div id="pdfTemplate" style="font-family: Arial, sans-serif; p-8 text-black; padding: 30px; background-color: white; width: 650px;">
+            <div style="display: flex; justify-content: space-between; border-b: 2px solid #4f46e5; padding-bottom: 15px; margin-bottom: 20px;">
+                <div>
+                    <h1 id="pdfBizName" style="font-size: 22px; font-weight: bold; color: #4f46e5; margin: 0;"></h1>
+                    <p id="pdfBizPhone" style="margin: 5px 0 0 0; color: #555; font-size: 14px;"></p>
+                </div>
+                <div style="text-align: right;">
+                    <h2 id="pdfDocType" style="font-size: 18px; font-weight: bold; margin: 0; text-transform: uppercase; color: #333;"></h2>
+                    <p style="margin: 5px 0 0 0; color: #777; font-size: 13px;">Ημερομηνία: <span id="pdfDate"></span></p>
+                </div>
             </div>
-            <div style="text-align: right;">
-                <h2 id="pdfDocType" style="font-size: 20px; font-weight: bold; margin: 0; text-transform: uppercase;"></h2>
-                <p style="margin: 5px 0 0 0; color: #777;">Ημερομηνία: <span id="pdfDate"></span></p>
+            <div style="margin: 20px 0;">
+                <strong style="color: #333; font-size: 14px;">Προς τον Πελάτη:</strong>
+                <p id="pdfClientName" style="margin: 5px 0; font-size: 15px; font-weight: bold;"></p>
             </div>
-        </div>
-        <div style="margin: 20px 0;">
-            <strong style="color: #333;">Προς τον Πελάτη:</strong>
-            <p id="pdfClientName" style="margin: 5px 0; font-size: 16px;"></p>
-        </div>
-        <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
-            <thead>
-                <tr style="background-color: #f3f4f6; text-align: left;">
-                    <th style="padding: 10px; border-bottom: 1px solid #ddd;">Περιγραφή Εργασίας</th>
-                    <th style="padding: 10px; border-bottom: 1px solid #ddd; text-align: center;">Ποσ.</th>
-                    <th style="padding: 10px; border-bottom: 1px solid #ddd; text-align: right;">Τιμή</th>
-                </tr>
-            </thead>
-            <tbody id="pdfTableBody"></tbody>
-        </table>
-        <div style="text-align: right; margin-top: 30px; font-size: 18px; font-weight: bold; border-top: 2px solid #333; padding-top: 10px;">
-            Γενικό Σύνολο: <span id="pdfTotal"></span>
+            <table style="width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px;">
+                <thead>
+                    <tr style="background-color: #f3f4f6; text-align: left;">
+                        <th style="padding: 10px; border-bottom: 2px solid #ddd;">Περιγραφή Εργασίας</th>
+                        <th style="padding: 10px; border-bottom: 2px solid #ddd; text-align: center; width: 60px;">Ποσ.</th>
+                        <th style="padding: 10px; border-bottom: 2px solid #ddd; text-align: right; width: 100px;">Τιμή</th>
+                    </tr>
+                </thead>
+                <tbody id="pdfTableBody"></tbody>
+            </table>
+            <div style="text-align: right; margin-top: 30px; font-size: 16px; font-weight: bold; border-top: 2px solid #333; padding-top: 10px;">
+                Γενικό Σύνολο: <span id="pdfTotal"></span>
+            </div>
         </div>
     </div>
 
@@ -232,7 +234,6 @@
 
             currentDocumentData = { clientName, clientPhone, clientEmail, docType, items, total };
 
-            // Εμφάνιση/Απόκρυψη κουμπιών επικοινωνίας
             document.getElementById('modalWaBtn').style.display = clientPhone ? 'block' : 'none';
             document.getElementById('modalViberBtn').style.display = clientPhone ? 'block' : 'none';
             document.getElementById('modalEmailBtn').style.display = clientEmail ? 'block' : 'none';
@@ -240,8 +241,16 @@
             document.getElementById('successModal').classList.remove('hidden');
         }
 
+        // ΔΙΟΡΘΩΜΕΝΗ ΛΕΙΤΟΥΡΓΙΑ PDF
         function downloadPDF() {
+            const btn = document.getElementById('downloadPdfBtn');
             const data = currentDocumentData;
+            
+            // Αλλαγή κειμένου στο κουμπί για να ξέρει ο χρήστης ότι επεξεργάζεται
+            btn.innerText = "⏳ Παραγωγή PDF...";
+            btn.disabled = true;
+
+            // Γέμισμα των στοιχείων στο template
             document.getElementById('pdfBizName').innerText = myBusiness.name || 'Επαγγελματίας';
             document.getElementById('pdfBizPhone').innerText = myBusiness.phone ? 'Τηλ: ' + myBusiness.phone : '';
             document.getElementById('pdfDocType').innerText = data.docType;
@@ -261,18 +270,34 @@
             });
             document.getElementById('pdfTotal').innerText = data.total + '€';
 
+            // Επιλογή του στοιχείου
             const element = document.getElementById('pdfTemplate');
+            
+            // Βελτιστοποιημένες ρυθμίσεις για να μην "κολλάει" ο browser του κινητού
             const opt = {
-                margin: 10,
-                filename: `${data.docType}_${data.clientName}.pdf`,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2 },
+                margin: [10, 10, 10, 10],
+                filename: `${data.docType}_${data.clientName.replace(/\s+/g, '_')}.pdf`,
+                image: { type: 'jpeg', quality: 0.95 },
+                html2canvas: { 
+                    scale: 1.5, // Ελαφρώς χαμηλότερο scale για ταχύτητα σε κινητά, αλλά παραμένει πεντακάθαρο
+                    useCORS: true,
+                    logging: false
+                },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
-            html2pdf().set(opt).from(element).save();
+
+            // Εκτέλεση με Promises για σωστό reset του κουμπιού
+            html2pdf().set(opt).from(element).save().then(() => {
+                btn.innerText = "📥 Κατέβασμα PDF στο κινητό";
+                btn.disabled = false;
+            }).catch((err) => {
+                console.error(err);
+                alert("Υπήρξε ένα πρόβλημα κατά τη λήψη. Δοκιμάστε ξανά.");
+                btn.innerText = "📥 Κατέβασμα PDF στο κινητό";
+                btn.disabled = false;
+            });
         }
 
-        // Βοηθητική συνάρτηση για χτίσιμο του κειμένου
         function buildTextMessage(data) {
             let msg = `*${data.docType} από: ${myBusiness.name}*\n---------------------------\n*Προς:* ${data.clientName}\n\n`;
             data.items.forEach(item => { msg += `- ${item.name} x${item.qty}: ${item.total}€\n`; });
@@ -289,29 +314,20 @@
             window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
         }
 
-        // ΝΕΑ ΛΕΙΤΟΥΡΓΙΑ: Αποστολή μέσω Viber
         function sendViber() {
             const data = currentDocumentData;
             let phone = data.clientPhone.replace(/\s+/g, '');
-            
-            // Το Viber προτιμάει το '+' μπροστά για διεθνή κλήση, π.χ. +3069XXXXXXXX
             if(!phone.startsWith('+30') && phone.length === 10) {
                 phone = '+30' + phone;
             } else if(phone.startsWith('30') && !phone.startsWith('+30')) {
                 phone = '+' + phone;
             }
-
-            // Καθαρό κείμενο χωρίς τα αστεράκια (*) του WhatsApp bold γιατί το Viber δεν τα υποστηρίζει με τον ίδιο τρόπο
             let msg = `${data.docType} από: ${myBusiness.name}\n---------------------------\nΠρος: ${data.clientName}\n\n`;
             data.items.forEach(item => { msg += `- ${item.name} x${item.qty}: ${item.total}€\n`; });
             msg += `\nΣύνολο: ${data.total}€\n---------------------------\n`;
             if(myBusiness.phone) msg += `Τηλ: ${myBusiness.phone}`;
 
-            // URL Scheme για Viber σε mobile συσκευές
-            const viberUrl = `viber://contact?number=${phone}&text=${encodeURIComponent(msg)}`;
-            
-            // Προσπάθεια ανοίγματος της εφαρμογής
-            window.open(viberUrl, '_blank');
+            window.open(`viber://contact?number=${phone}&text=${encodeURIComponent(msg)}`, '_blank');
         }
 
         function sendMailClient() {
