@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BizTool - Προσφορές & Αποδείξεις</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased pb-12">
+
+    <div class="max-w-md mx-auto px-4 pt-6">
+        <header class="flex justify-between items-center mb-6">
+            <h1 class="text-2xl font-bold text-indigo-600">BizTool 🛠️</h1>
+            <button onclick="toggleSetup()" class="text-sm bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-1 px-3 rounded-lg transition">
+                ⚙️ Ρυθμίσεις
+            </button>
+        </header>
+
+        <div id="setupSection" class="hidden bg-white p-5 rounded-2xl shadow-sm border border-gray-100 mb-6">
+            <h2 class="text-lg font-semibold mb-4 text-gray-900 border-b pb-2">Στοιχεία Επαγγελματία</h2>
+            <div class="space-y-3 mb-4">
+                <input type="text" id="bizName" placeholder="Όνομα / Επωνυμία Επιχείρησης" class="w-full p-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                <input type="text" id="bizPhone" placeholder="Τηλέφωνο Επικοινωνίας" class="w-full p-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+            </div>
+
+            <h2 class="text-md font-semibold mb-2 text-gray-900">Οι Υπηρεσίες & Τιμές μου</h2>
+            <div id="servicesSetupList" class="space-y-2 mb-3">
+                </div>
+            <button onclick="addServiceField('', '')" class="w-full bg-gray-100 hover:bg-gray-200 text-indigo-600 text-xs font-semibold py-2 rounded-lg border border-dashed border-indigo-300 transition mb-4">
+                + Προσθήκη Νέας Υπηρεσίας
+            </button>
+
+            <button onclick="saveSetup()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-lg text-sm transition shadow-sm">
+                Αποθήκευση Αλλαγών
+            </button>
+        </div>
+
+        <main class="space-y-6">
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+                <h2 class="text-md font-semibold mb-3 text-gray-900">Στοιχεία Πελάτη</h2>
+                <div class="space-y-3">
+                    <input type="text" id="clientName" placeholder="Όνομα Πελάτη" class="w-full p-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                    <input type="text" id="clientPhone" placeholder="Κινητό Τηλέφωνο (για WhatsApp)" class="w-full p-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                    <div class="flex gap-4 pt-1">
+                        <label class="flex items-center text-sm font-medium text-gray-700 cursor-pointer">
+                            <input type="radio" name="docType" value="Προσφορά" checked class="mr-2 text-indigo-600 focus:ring-indigo-500"> Προσφορά
+                        </label>
+                        <label class="flex items-center text-sm font-medium text-gray-700 cursor-pointer">
+                            <input type="radio" name="docType" value="Απόδειξη" class="mr-2 text-indigo-600 focus:ring-indigo-500"> Απόδειξη
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+                <h2 class="text-md font-semibold mb-3 text-gray-900">Επιλογή Εργασιών</h2>
+                <div id="servicesSelectionList" class="space-y-3">
+                    <p class="text-xs text-gray-400 italic">Πατήστε τις Ρυθμίσεις πάνω δεξιά για να προσθέσετε τις υπηρεσίες σας.</p>
+                </div>
+            </div>
+
+            <button onclick="generateOutput()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition shadow-md flex justify-center items-center gap-2 text-base">
+                🚀 Δημιουργία & Αποστολή
+            </button>
+        </main>
+    </div>
+
+    <script>
+        // Αρχικά δεδομένα αν το localstorage είναι άδειο
+        let myBusiness = JSON.parse(localStorage.getItem('myBusiness')) || { name: '', phone: '' };
+        let myServices = JSON.parse(localStorage.getItem('myServices')) || [];
+
+        // Μόλις φορτώσει η σελίδα
+        window.onload = function() {
+            document.getElementById('bizName').value = myBusiness.name;
+            document.getElementById('bizPhone').value = myBusiness.phone;
+            
+            if(myServices.length === 0) {
+                // Μερικά defaults για να μην είναι εντελώς άδειο την πρώτη φορά
+                myServices = [
+                    {name: "Εργασία / Ώρα", price: "25"},
+                    {name: "Βασική Επίσκεψη", price: "35"}
+                ];
+            }
+            
+            renderSetupServices();
+            renderSelectionServices();
+        };
+
+        function toggleSetup() {
+            const section = document.getElementById('setupSection');
+            section.classList.toggle('hidden');
+        }
+
+        // Εμφάνιση των υπηρεσιών στο Setup panel
+        function renderSetupServices() {
+            const list = document.getElementById('servicesSetupList');
+            list.innerHTML = '';
+            myServices.forEach((service, index) => {
+                addServiceField(service.name, service.price);
+            });
+        }
+
+        // Προσθήκη νέων input fields στο Setup
+        function addServiceField(name, price) {
+            const list = document.getElementById('servicesSetupList');
+            const div = document.createElement('div');
+            div.className = 'flex gap-2 items-center service-row';
+            div.innerHTML = `
+                <input type="text" placeholder="Υπηρεσία" value="${name}" class="flex-1 p-2 border rounded-lg text-xs outline-none s-name">
+                <input type="number" placeholder="€" value="${price}" class="w-20 p-2 border rounded-lg text-xs outline-none s-price">
+                <button onclick="this.parentElement.remove()" class="text-red-500 text-sm px-1">✕</button>
+            `;
+            list.appendChild(div);
+        }
+
+        // Αποθήκευση ρυθμίσεων στο LocalStorage
+        function saveSetup() {
+            myBusiness.name = document.getElementById('bizName').value;
+            myBusiness.phone = document.getElementById('bizPhone').value;
+            
+            const rows = document.querySelectorAll('.service-row');
+            myServices = [];
+            rows.forEach(row => {
+                const name = row.querySelector('.s-name').value;
+                const price = row.querySelector('.s-price').value;
+                if(name && price) {
+                    myServices.push({name, price});
+                }
+            });
+
+            localStorage.setItem('myBusiness', JSON.stringify(myBusiness));
+            localStorage.setItem('myServices', JSON.stringify(myServices));
+            
+            renderSelectionServices();
+            toggleSetup();
+            alert('Οι ρυθμίσεις αποθηκεύτηκαν με επιτυχία!');
+        }
+
+        // Εμφάνιση των υπηρεσιών στην κεντρική οθόνη με checkbox και ποσότητα
+        function renderSelectionServices() {
+            const list = document.getElementById('servicesSelectionList');
+            list.innerHTML = '';
+            
+            if(myServices.length === 0) {
+                list.innerHTML = '<p class="text-xs text-gray-400 italic">Πατήστε τις Ρυθμίσεις πάνω δεξιά για να προσθέσετε τις υπηρεσίες σας.</p>';
+                return;
+            }
+
+            myServices.forEach((service, index) => {
+                const div = document.createElement('div');
+                div.className = 'flex items-center justify-between p-2.5 bg-gray-50 rounded-xl border border-gray-200';
+                div.innerHTML = `
+                    <label class="flex items-center space-x-3 cursor-pointer text-sm font-medium text-gray-700 flex-1">
+                        <input type="checkbox" value="${index}" class="service-checkbox w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 mr-2">
+                        <span>${service.name} <span class="text-gray-400 font-normal">(${service.price}€)</span></span>
+                    </label>
+                    <div class="flex items-center gap-1">
+                        <span class="text-xs text-gray-400">Ποσ.</span>
+                        <input type="number" value="1" min="1" class="service-qty w-12 p-1 text-center border rounded-lg text-xs outline-none">
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        // Η συνάρτηση που "δένει" τα στοιχεία και ανοίγει το WhatsApp
+        function generateOutput() {
+            const clientName = document.getElementById('clientName').value;
+            let clientPhone = document.getElementById('clientPhone').value;
+            const docType = document.querySelector('input[name="docType"]:checked').value;
+
+            if(!clientName || !clientPhone) {
+                alert('Παρακαλώ συμπληρώστε το όνομα και το κινητό του πελάτη.');
+                return;
+            }
+
+            // Καθαρισμός τηλεφώνου για να έχει μορφή 30XXXXXXXXXX
+            clientPhone = clientPhone.replace(/\s+/g, '');
+            if(!clientPhone.startsWith('30') && clientPhone.length === 10) {
+                clientPhone = '30' + clientPhone;
+            }
+
+            const checkboxes = document.querySelectorAll('.service-checkbox');
+            const qtys = document.querySelectorAll('.service-qty');
+            
+            let selectedItems = [];
+            let totalSum = 0;
+
+            checkboxes.forEach((cb, i) => {
+                if(cb.checked) {
+                    const idx = cb.value;
+                    const service = myServices[idx];
+                    const qty = parseInt(qtys[i].value) || 1;
+                    const lineTotal = parseFloat(service.price) * qty;
+                    
+                    selectedItems.push(`- ${service.name} x${qty}: ${lineTotal}€`);
+                    totalSum += lineTotal;
+                }
+            });
+
+            if(selectedItems.length === 0) {
+                alert('Παρακαλώ επιλέξτε τουλάχιστον μία εργασία.');
+                return;
+            }
+
+            // Χτίσιμο του μηνύματος για το WhatsApp
+            let message = `*${docType} από: ${myBusiness.name || 'Τεχνικός'}*\n`;
+            message += `---------------------------\n`;
+            message += `*Προς:* ${clientName}\n\n`;
+            message += `*Αναλυτικά οι εργασίες:*\n`;
+            selectedItems.forEach(item => {
+                message += `${item}\n`;
+            });
+            message += `\n*Σύνολο: ${totalSum}€*\n`;
+            message += `---------------------------\n`;
+            if(myBusiness.phone) message += `Τηλ. Επικοινωνίας: ${myBusiness.phone}`;
+
+            // URL Encoding για να διαβάζεται σωστά από το WhatsApp link
+            const whatsappUrl = `https://wa.me/${clientPhone}?text=${encodeURIComponent(message)}`;
+            
+            // Άνοιγμα του WhatsApp σε νέο tab
+            window.open(whatsappUrl, '_blank');
+        }
+    </script>
+</body>
+</html>
