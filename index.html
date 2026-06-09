@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BizTool - Προσφορές & Αποδείξεις</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans antialiased pb-12">
 
@@ -24,8 +25,7 @@
             </div>
 
             <h2 class="text-md font-semibold mb-2 text-gray-900">Οι Υπηρεσίες & Τιμές μου</h2>
-            <div id="servicesSetupList" class="space-y-2 mb-3">
-                </div>
+            <div id="servicesSetupList" class="space-y-2 mb-3"></div>
             <button onclick="addServiceField('', '')" class="w-full bg-gray-100 hover:bg-gray-200 text-indigo-600 text-xs font-semibold py-2 rounded-lg border border-dashed border-indigo-300 transition mb-4">
                 + Προσθήκη Νέας Υπηρεσίας
             </button>
@@ -40,13 +40,15 @@
                 <h2 class="text-md font-semibold mb-3 text-gray-900">Στοιχεία Πελάτη</h2>
                 <div class="space-y-3">
                     <input type="text" id="clientName" placeholder="Όνομα Πελάτη" class="w-full p-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
-                    <input type="text" id="clientPhone" placeholder="Κινητό Τηλέφωνο (για WhatsApp)" class="w-full p-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                    <input type="text" id="clientPhone" placeholder="Κινητό (για WhatsApp) - Προαιρετικό" class="w-full p-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                    <input type="email" id="clientEmail" placeholder="Email Πελάτη - Προαιρετικό" class="w-full p-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                    
                     <div class="flex gap-4 pt-1">
                         <label class="flex items-center text-sm font-medium text-gray-700 cursor-pointer">
-                            <input type="radio" name="docType" value="Προσφορά" checked class="mr-2 text-indigo-600 focus:ring-indigo-500"> Προσφορά
+                            <input type="radio" name="docType" value="Προσφορά" checked class="mr-2 text-indigo-600"> Προσφορά
                         </label>
                         <label class="flex items-center text-sm font-medium text-gray-700 cursor-pointer">
-                            <input type="radio" name="docType" value="Απόδειξη" class="mr-2 text-indigo-600 focus:ring-indigo-500"> Απόδειξη
+                            <input type="radio" name="docType" value="Απόδειξη" class="mr-2 text-indigo-600"> Απόδειξη
                         </label>
                     </div>
                 </div>
@@ -54,54 +56,94 @@
 
             <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
                 <h2 class="text-md font-semibold mb-3 text-gray-900">Επιλογή Εργασιών</h2>
-                <div id="servicesSelectionList" class="space-y-3">
-                    <p class="text-xs text-gray-400 italic">Πατήστε τις Ρυθμίσεις πάνω δεξιά για να προσθέσετε τις υπηρεσίες σας.</p>
-                </div>
+                <div id="servicesSelectionList" class="space-y-3"></div>
             </div>
 
-            <button onclick="generateOutput()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition shadow-md flex justify-center items-center gap-2 text-base">
-                🚀 Δημιουργία & Αποστολή
+            <button onclick="processDocument()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition shadow-md flex justify-center items-center gap-2 text-base">
+                🚀 Δημιουργία Έκδοσης
             </button>
         </main>
     </div>
 
+    <div id="successModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white w-full max-w-sm rounded-2xl p-6 shadow-xl space-y-4">
+            <div class="text-center">
+                <div class="w-12 h-12 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-2 text-xl">✓</div>
+                <h3 class="text-lg font-bold text-gray-900">Το έγγραφο δημιουργήθηκε!</h3>
+                <p class="text-xs text-gray-500">Επιλέξτε πώς θέλετε να το στείλετε ή να το αποθηκεύσετε.</p>
+            </div>
+            
+            <div class="space-y-2 pt-2">
+                <button onclick="downloadPDF()" class="w-full bg-gray-800 hover:bg-gray-900 text-white font-medium py-2.5 rounded-lg text-sm transition flex justify-center items-center gap-2">
+                    📥 Κατέβασμα PDF στο κινητό
+                </button>
+                <button id="modalWaBtn" onclick="sendWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2.5 rounded-lg text-sm transition flex justify-center items-center gap-2">
+                    💬 Αποστολή μέσω WhatsApp
+                </button>
+                <button id="modalEmailBtn" onclick="sendMailClient()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-lg text-sm transition flex justify-center items-center gap-2">
+                    ✉️ Αποστολή στο Email πελάτη
+                </button>
+            </div>
+
+            <button onclick="closeModal()" class="w-full text-center text-xs text-gray-400 hover:text-gray-600 pt-2 block">
+                « Επιστροφή στην αρχική
+            </button>
+        </div>
+    </div>
+
+    <div id="pdfTemplate" class="absolute left-[-9999px] bg-white p-8 text-black" style="width: 700px;">
+        <div style="display: flex; justify-content: space-between; border-b: 2px solid #4f46e5; padding-bottom: 15px;">
+            <div>
+                <h1 id="pdfBizName" style="font-size: 24px; font-weight: bold; color: #4f46e5; margin: 0;"></h1>
+                <p id="pdfBizPhone" style="margin: 5px 0 0 0; color: #555;"></p>
+            </div>
+            <div style="text-align: right;">
+                <h2 id="pdfDocType" style="font-size: 20px; font-weight: bold; margin: 0; text-transform: uppercase;"></h2>
+                <p style="margin: 5px 0 0 0; color: #777;">Ημερομηνία: <span id="pdfDate"></span></p>
+            </div>
+        </div>
+        <div style="margin: 20px 0;">
+            <strong style="color: #333;">Προς τον Πελάτη:</strong>
+            <p id="pdfClientName" style="margin: 5px 0; font-size: 16px;"></p>
+        </div>
+        <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+            <thead>
+                <tr style="background-color: #f3f4f6; text-align: left;">
+                    <th style="padding: 10px; border-bottom: 1px solid #ddd;">Περιγραφή Εργασίας</th>
+                    <th style="padding: 10px; border-bottom: 1px solid #ddd; text-align: center;">Ποσ.</th>
+                    <th style="padding: 10px; border-bottom: 1px solid #ddd; text-align: right;">Τιμή</th>
+                </tr>
+            </thead>
+            <tbody id="pdfTableBody"></tbody>
+        </table>
+        <div style="text-align: right; margin-top: 30px; font-size: 18px; font-weight: bold; border-top: 2px solid #333; padding-top: 10px;">
+            Γενικό Σύνολο: <span id="pdfTotal"></span>
+        </div>
+    </div>
+
     <script>
-        // Αρχικά δεδομένα αν το localstorage είναι άδειο
         let myBusiness = JSON.parse(localStorage.getItem('myBusiness')) || { name: '', phone: '' };
         let myServices = JSON.parse(localStorage.getItem('myServices')) || [];
+        let currentDocumentData = null; // Εδώ θα κρατάμε τα δεδομένα του τρέχοντος εγγράφου
 
-        // Μόλις φορτώσει η σελίδα
         window.onload = function() {
             document.getElementById('bizName').value = myBusiness.name;
             document.getElementById('bizPhone').value = myBusiness.phone;
-            
             if(myServices.length === 0) {
-                // Μερικά defaults για να μην είναι εντελώς άδειο την πρώτη φορά
-                myServices = [
-                    {name: "Εργασία / Ώρα", price: "25"},
-                    {name: "Βασική Επίσκεψη", price: "35"}
-                ];
+                myServices = [{name: "Εργασία / Ώρα", price: "25"}, {name: "Βασική Επίσκεψη", price: "35"}];
             }
-            
             renderSetupServices();
             renderSelectionServices();
         };
 
-        function toggleSetup() {
-            const section = document.getElementById('setupSection');
-            section.classList.toggle('hidden');
-        }
+        function toggleSetup() { document.getElementById('setupSection').classList.toggle('hidden'); }
 
-        // Εμφάνιση των υπηρεσιών στο Setup panel
         function renderSetupServices() {
             const list = document.getElementById('servicesSetupList');
             list.innerHTML = '';
-            myServices.forEach((service, index) => {
-                addServiceField(service.name, service.price);
-            });
+            myServices.forEach(service => addServiceField(service.name, service.price));
         }
 
-        // Προσθήκη νέων input fields στο Setup
         function addServiceField(name, price) {
             const list = document.getElementById('servicesSetupList');
             const div = document.createElement('div');
@@ -114,49 +156,39 @@
             list.appendChild(div);
         }
 
-        // Αποθήκευση ρυθμίσεων στο LocalStorage
         function saveSetup() {
             myBusiness.name = document.getElementById('bizName').value;
             myBusiness.phone = document.getElementById('bizPhone').value;
-            
             const rows = document.querySelectorAll('.service-row');
             myServices = [];
             rows.forEach(row => {
                 const name = row.querySelector('.s-name').value;
                 const price = row.querySelector('.s-price').value;
-                if(name && price) {
-                    myServices.push({name, price});
-                }
+                if(name && price) myServices.push({name, price});
             });
-
             localStorage.setItem('myBusiness', JSON.stringify(myBusiness));
             localStorage.setItem('myServices', JSON.stringify(myServices));
-            
             renderSelectionServices();
             toggleSetup();
-            alert('Οι ρυθμίσεις αποθηκεύτηκαν με επιτυχία!');
+            alert('Οι ρυθμίσεις αποθηκεύτηκαν!');
         }
 
-        // Εμφάνιση των υπηρεσιών στην κεντρική οθόνη με checkbox και ποσότητα
         function renderSelectionServices() {
             const list = document.getElementById('servicesSelectionList');
             list.innerHTML = '';
-            
             if(myServices.length === 0) {
-                list.innerHTML = '<p class="text-xs text-gray-400 italic">Πατήστε τις Ρυθμίσεις πάνω δεξιά για να προσθέσετε τις υπηρεσίες σας.</p>';
+                list.innerHTML = '<p class="text-xs text-gray-400 italic">Πατήστε τις Ρυθμίσεις για προσθήκη υπηρεσιών.</p>';
                 return;
             }
-
             myServices.forEach((service, index) => {
                 const div = document.createElement('div');
                 div.className = 'flex items-center justify-between p-2.5 bg-gray-50 rounded-xl border border-gray-200';
                 div.innerHTML = `
                     <label class="flex items-center space-x-3 cursor-pointer text-sm font-medium text-gray-700 flex-1">
-                        <input type="checkbox" value="${index}" class="service-checkbox w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 mr-2">
+                        <input type="checkbox" value="${index}" class="service-checkbox w-4 h-4 text-indigo-600 mr-2">
                         <span>${service.name} <span class="text-gray-400 font-normal">(${service.price}€)</span></span>
                     </label>
                     <div class="flex items-center gap-1">
-                        <span class="text-xs text-gray-400">Ποσ.</span>
                         <input type="number" value="1" min="1" class="service-qty w-12 p-1 text-center border rounded-lg text-xs outline-none">
                     </div>
                 `;
@@ -164,64 +196,111 @@
             });
         }
 
-        // Η συνάρτηση που "δένει" τα στοιχεία και ανοίγει το WhatsApp
-        function generateOutput() {
+        // Επεξεργασία και προετοιμασία των στοιχείων
+        function processDocument() {
             const clientName = document.getElementById('clientName').value;
-            let clientPhone = document.getElementById('clientPhone').value;
+            const clientPhone = document.getElementById('clientPhone').value;
+            const clientEmail = document.getElementById('clientEmail').value;
             const docType = document.querySelector('input[name="docType"]:checked').value;
 
-            if(!clientName || !clientPhone) {
-                alert('Παρακαλώ συμπληρώστε το όνομα και το κινητό του πελάτη.');
+            if(!clientName) {
+                alert('Παρακαλώ βάλτε το όνομα του πελάτη.');
                 return;
-            }
-
-            // Καθαρισμός τηλεφώνου για να έχει μορφή 30XXXXXXXXXX
-            clientPhone = clientPhone.replace(/\s+/g, '');
-            if(!clientPhone.startsWith('30') && clientPhone.length === 10) {
-                clientPhone = '30' + clientPhone;
             }
 
             const checkboxes = document.querySelectorAll('.service-checkbox');
             const qtys = document.querySelectorAll('.service-qty');
-            
-            let selectedItems = [];
-            let totalSum = 0;
+            let items = [];
+            let total = 0;
 
             checkboxes.forEach((cb, i) => {
                 if(cb.checked) {
-                    const idx = cb.value;
-                    const service = myServices[idx];
+                    const service = myServices[cb.value];
                     const qty = parseInt(qtys[i].value) || 1;
                     const lineTotal = parseFloat(service.price) * qty;
-                    
-                    selectedItems.push(`- ${service.name} x${qty}: ${lineTotal}€`);
-                    totalSum += lineTotal;
+                    items.push({ name: service.name, qty: qty, price: service.price, total: lineTotal });
+                    total += lineTotal;
                 }
             });
 
-            if(selectedItems.length === 0) {
-                alert('Παρακαλώ επιλέξτε τουλάχιστον μία εργασία.');
+            if(items.length === 0) {
+                alert('Επιλέξτε τουλάχιστον μία εργασία.');
                 return;
             }
 
-            // Χτίσιμο του μηνύματος για το WhatsApp
-            let message = `*${docType} από: ${myBusiness.name || 'Τεχνικός'}*\n`;
-            message += `---------------------------\n`;
-            message += `*Προς:* ${clientName}\n\n`;
-            message += `*Αναλυτικά οι εργασίες:*\n`;
-            selectedItems.forEach(item => {
-                message += `${item}\n`;
-            });
-            message += `\n*Σύνολο: ${totalSum}€*\n`;
-            message += `---------------------------\n`;
-            if(myBusiness.phone) message += `Τηλ. Επικοινωνίας: ${myBusiness.phone}`;
+            // Αποθήκευση δεδομένων καθολικά για χρήση από το Modal
+            currentDocumentData = { clientName, clientPhone, clientEmail, docType, items, total };
 
-            // URL Encoding για να διαβάζεται σωστά από το WhatsApp link
-            const whatsappUrl = `https://wa.me/${clientPhone}?text=${encodeURIComponent(message)}`;
-            
-            // Άνοιγμα του WhatsApp σε νέο tab
-            window.open(whatsappUrl, '_blank');
+            // Εμφάνιση ή απόκρυψη κουμπιών ανάλογα με το τι συμπλήρωσε ο μάστορας
+            document.getElementById('modalWaBtn').style.display = clientPhone ? 'block' : 'none';
+            document.getElementById('modalEmailBtn').style.display = clientEmail ? 'block' : 'none';
+
+            // Εμφάνιση του Modal
+            document.getElementById('successModal').classList.remove('hidden');
         }
+
+        // Λειτουργία 1: Κατέβασμα PDF
+        function downloadPDF() {
+            const data = currentDocumentData;
+            // Γέμισμα του κρυφού HTML template
+            document.getElementById('pdfBizName').innerText = myBusiness.name || 'Επαγγελματίας';
+            document.getElementById('pdfBizPhone').innerText = myBusiness.phone ? 'Τηλ: ' + myBusiness.phone : '';
+            document.getElementById('pdfDocType').innerText = data.docType;
+            document.getElementById('pdfDate').innerText = new Date().toLocaleDateString('el-GR');
+            document.getElementById('pdfClientName').innerText = data.clientName;
+
+            const tbody = document.getElementById('pdfTableBody');
+            tbody.innerHTML = '';
+            data.items.forEach(item => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td style="padding: 10px; border-bottom: 1px solid #eee;">${item.name}</td>
+                        <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: center;">${item.qty}</td>
+                        <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: right;">${item.total}€</td>
+                    </tr>
+                `;
+            });
+            document.getElementById('pdfTotal').innerText = data.total + '€';
+
+            // Ρυθμίσεις και παραγωγή PDF
+            const element = document.getElementById('pdfTemplate');
+            const opt = {
+                margin: 10,
+                filename: `${data.docType}_${data.clientName}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(element).save();
+        }
+
+        // Λειτουργία 2: Αποστολή WhatsApp (Απλό κείμενο)
+        function sendWhatsApp() {
+            const data = currentDocumentData;
+            let phone = data.clientPhone.replace(/\s+/g, '');
+            if(!phone.startsWith('30') && phone.length === 10) phone = '30' + phone;
+
+            let msg = `*${data.docType} από: ${myBusiness.name}*\n---------------------------\n*Προς:* ${data.clientName}\n\n`;
+            data.items.forEach(item => { msg += `- ${item.name} x${item.qty}: ${item.total}€\n`; });
+            msg += `\n*Σύνολο: ${data.total}€*\n---------------------------\n`;
+            if(myBusiness.phone) msg += `Τηλ: ${myBusiness.phone}`;
+
+            window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
+        }
+
+        // Λειτουργία 3: Αποστολή Email (mailto)
+        function sendMailClient() {
+            const data = currentDocumentData;
+            const subject = encodeURIComponent(`${data.docType} - ${myBusiness.name}`);
+            
+            let body = `Αγαπητέ/ή ${data.clientName},\n\nΣας στέλνουμε την ${data.docType.toLowerCase()} για τις εργασίες μας:\n\n`;
+            data.items.forEach(item => { body += `- ${item.name} (Ποσότητα: ${item.qty}): ${item.total}€\n`; });
+            body += `\nΣύνολο: ${data.total}€\n\nΜε εκτίμηση,\n${myBusiness.name}\n${myBusiness.phone}`;
+            
+            window.open(`mailto:${data.clientEmail}?subject=${subject}&body=${encodeURIComponent(body)}`);
+        }
+
+        function closeModal() { document.getElementById('successModal').classList.add('hidden'); }
     </script>
 </body>
 </html>
