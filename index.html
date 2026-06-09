@@ -40,7 +40,7 @@
                 <h2 class="text-md font-semibold mb-3 text-gray-900">Στοιχεία Πελάτη</h2>
                 <div class="space-y-3">
                     <input type="text" id="clientName" placeholder="Όνομα Πελάτη" class="w-full p-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
-                    <input type="text" id="clientPhone" placeholder="Κινητό (για WhatsApp) - Προαιρετικό" class="w-full p-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                    <input type="text" id="clientPhone" placeholder="Κινητό (για WhatsApp / Viber)" class="w-full p-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
                     <input type="email" id="clientEmail" placeholder="Email Πελάτη - Προαιρετικό" class="w-full p-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
                     
                     <div class="flex gap-4 pt-1">
@@ -70,7 +70,7 @@
             <div class="text-center">
                 <div class="w-12 h-12 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-2 text-xl">✓</div>
                 <h3 class="text-lg font-bold text-gray-900">Το έγγραφο δημιουργήθηκε!</h3>
-                <p class="text-xs text-gray-500">Επιλέξτε πώς θέλετε να το στείλετε ή να το αποθηκεύσετε.</p>
+                <p class="text-xs text-gray-500">Επιλέξτε πώς θέλετε να το διακινήσετε.</p>
             </div>
             
             <div class="space-y-2 pt-2">
@@ -79,6 +79,9 @@
                 </button>
                 <button id="modalWaBtn" onclick="sendWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2.5 rounded-lg text-sm transition flex justify-center items-center gap-2">
                     💬 Αποστολή μέσω WhatsApp
+                </button>
+                <button id="modalViberBtn" onclick="sendViber()" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-2.5 rounded-lg text-sm transition flex justify-center items-center gap-2">
+                    💜 Αποστολή μέσω Viber
                 </button>
                 <button id="modalEmailBtn" onclick="sendMailClient()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-lg text-sm transition flex justify-center items-center gap-2">
                     ✉️ Αποστολή στο Email πελάτη
@@ -124,7 +127,7 @@
     <script>
         let myBusiness = JSON.parse(localStorage.getItem('myBusiness')) || { name: '', phone: '' };
         let myServices = JSON.parse(localStorage.getItem('myServices')) || [];
-        let currentDocumentData = null; // Εδώ θα κρατάμε τα δεδομένα του τρέχοντος εγγράφου
+        let currentDocumentData = null;
 
         window.onload = function() {
             document.getElementById('bizName').value = myBusiness.name;
@@ -196,7 +199,6 @@
             });
         }
 
-        // Επεξεργασία και προετοιμασία των στοιχείων
         function processDocument() {
             const clientName = document.getElementById('clientName').value;
             const clientPhone = document.getElementById('clientPhone').value;
@@ -228,21 +230,18 @@
                 return;
             }
 
-            // Αποθήκευση δεδομένων καθολικά για χρήση από το Modal
             currentDocumentData = { clientName, clientPhone, clientEmail, docType, items, total };
 
-            // Εμφάνιση ή απόκρυψη κουμπιών ανάλογα με το τι συμπλήρωσε ο μάστορας
+            // Εμφάνιση/Απόκρυψη κουμπιών επικοινωνίας
             document.getElementById('modalWaBtn').style.display = clientPhone ? 'block' : 'none';
+            document.getElementById('modalViberBtn').style.display = clientPhone ? 'block' : 'none';
             document.getElementById('modalEmailBtn').style.display = clientEmail ? 'block' : 'none';
 
-            // Εμφάνιση του Modal
             document.getElementById('successModal').classList.remove('hidden');
         }
 
-        // Λειτουργία 1: Κατέβασμα PDF
         function downloadPDF() {
             const data = currentDocumentData;
-            // Γέμισμα του κρυφού HTML template
             document.getElementById('pdfBizName').innerText = myBusiness.name || 'Επαγγελματίας';
             document.getElementById('pdfBizPhone').innerText = myBusiness.phone ? 'Τηλ: ' + myBusiness.phone : '';
             document.getElementById('pdfDocType').innerText = data.docType;
@@ -262,7 +261,6 @@
             });
             document.getElementById('pdfTotal').innerText = data.total + '€';
 
-            // Ρυθμίσεις και παραγωγή PDF
             const element = document.getElementById('pdfTemplate');
             const opt = {
                 margin: 10,
@@ -274,29 +272,54 @@
             html2pdf().set(opt).from(element).save();
         }
 
-        // Λειτουργία 2: Αποστολή WhatsApp (Απλό κείμενο)
-        function sendWhatsApp() {
-            const data = currentDocumentData;
-            let phone = data.clientPhone.replace(/\s+/g, '');
-            if(!phone.startsWith('30') && phone.length === 10) phone = '30' + phone;
-
+        // Βοηθητική συνάρτηση για χτίσιμο του κειμένου
+        function buildTextMessage(data) {
             let msg = `*${data.docType} από: ${myBusiness.name}*\n---------------------------\n*Προς:* ${data.clientName}\n\n`;
             data.items.forEach(item => { msg += `- ${item.name} x${item.qty}: ${item.total}€\n`; });
             msg += `\n*Σύνολο: ${data.total}€*\n---------------------------\n`;
             if(myBusiness.phone) msg += `Τηλ: ${myBusiness.phone}`;
+            return msg;
+        }
 
+        function sendWhatsApp() {
+            const data = currentDocumentData;
+            let phone = data.clientPhone.replace(/\s+/g, '');
+            if(!phone.startsWith('30') && phone.length === 10) phone = '30' + phone;
+            const msg = buildTextMessage(data);
             window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
         }
 
-        // Λειτουργία 3: Αποστολή Email (mailto)
+        // ΝΕΑ ΛΕΙΤΟΥΡΓΙΑ: Αποστολή μέσω Viber
+        function sendViber() {
+            const data = currentDocumentData;
+            let phone = data.clientPhone.replace(/\s+/g, '');
+            
+            // Το Viber προτιμάει το '+' μπροστά για διεθνή κλήση, π.χ. +3069XXXXXXXX
+            if(!phone.startsWith('+30') && phone.length === 10) {
+                phone = '+30' + phone;
+            } else if(phone.startsWith('30') && !phone.startsWith('+30')) {
+                phone = '+' + phone;
+            }
+
+            // Καθαρό κείμενο χωρίς τα αστεράκια (*) του WhatsApp bold γιατί το Viber δεν τα υποστηρίζει με τον ίδιο τρόπο
+            let msg = `${data.docType} από: ${myBusiness.name}\n---------------------------\nΠρος: ${data.clientName}\n\n`;
+            data.items.forEach(item => { msg += `- ${item.name} x${item.qty}: ${item.total}€\n`; });
+            msg += `\nΣύνολο: ${data.total}€\n---------------------------\n`;
+            if(myBusiness.phone) msg += `Τηλ: ${myBusiness.phone}`;
+
+            // URL Scheme για Viber σε mobile συσκευές
+            const viberUrl = `viber://contact?number=${phone}&text=${encodeURIComponent(msg)}`;
+            
+            // Προσπάθεια ανοίγματος της εφαρμογής
+            window.open(viberUrl, '_blank');
+        }
+
         function sendMailClient() {
             const data = currentDocumentData;
             const subject = encodeURIComponent(`${data.docType} - ${myBusiness.name}`);
-            
             let body = `Αγαπητέ/ή ${data.clientName},\n\nΣας στέλνουμε την ${data.docType.toLowerCase()} για τις εργασίες μας:\n\n`;
             data.items.forEach(item => { body += `- ${item.name} (Ποσότητα: ${item.qty}): ${item.total}€\n`; });
             body += `\nΣύνολο: ${data.total}€\n\nΜε εκτίμηση,\n${myBusiness.name}\n${myBusiness.phone}`;
-            
             window.open(`mailto:${data.clientEmail}?subject=${subject}&body=${encodeURIComponent(body)}`);
         }
 
