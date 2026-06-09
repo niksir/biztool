@@ -12,7 +12,7 @@
     <div class="max-w-md mx-auto px-4 pt-6">
         <header class="flex justify-between items-center mb-6">
             <h1 class="text-2xl font-bold text-indigo-600">BizTool 🛠️</h1>
-            <button onclick="toggleSetup()" class="text-sm bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-1 px-3 rounded-lg transition">
+            <button onclick="toggleSetup()" class="text-sm bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-1 px-3 rounded-lg transition cursor-pointer">
                 ⚙️ Ρυθμίσεις
             </button>
         </header>
@@ -26,11 +26,11 @@
 
             <h2 class="text-md font-semibold mb-2 text-gray-900">Οι Υπηρεσίες & Τιμές μου</h2>
             <div id="servicesSetupList" class="space-y-2 mb-3"></div>
-            <button onclick="addServiceField('', '')" class="w-full bg-gray-100 text-indigo-600 text-xs font-semibold py-2 rounded-lg border border-dashed border-indigo-300 mb-4">
+            <button onclick="addServiceField('', '')" class="w-full bg-gray-100 text-indigo-600 text-xs font-semibold py-2 rounded-lg border border-dashed border-indigo-300 mb-4 cursor-pointer">
                 + Προσθήκη Νέας Υπηρεσίας
             </button>
 
-            <button onclick="saveSetup()" class="w-full bg-indigo-600 text-white font-medium py-2.5 rounded-lg text-sm shadow-sm">
+            <button onclick="saveSetup()" class="w-full bg-indigo-600 text-white font-medium py-2.5 rounded-lg text-sm shadow-sm cursor-pointer">
                 Αποθήκευση Αλλαγών
             </button>
         </div>
@@ -94,33 +94,33 @@
         </div>
     </div>
 
-    <div style="display: none;">
-        <div id="pdfTemplate" style="font-family: Arial, sans-serif; p-8 text-black; padding: 30px; background-color: white; width: 650px;">
-            <div style="display: flex; justify-content: space-between; border-b: 2px solid #4f46e5; padding-bottom: 15px; margin-bottom: 20px;">
+    <div style="position: absolute; left: -9999px; top: 0; width: 650px;">
+        <div id="pdfTemplate" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; padding: 40px; background-color: white; color: black; line-height: 1.5;">
+            <div style="display: flex; justify-content: space-between; border-b: 2px solid #4f46e5; padding-bottom: 20px; margin-bottom: 25px;">
                 <div>
-                    <h1 id="pdfBizName" style="font-size: 22px; font-weight: bold; color: #4f46e5; margin: 0;"></h1>
-                    <p id="pdfBizPhone" style="margin: 5px 0 0 0; color: #555; font-size: 14px;"></p>
+                    <h1 id="pdfBizName" style="font-size: 24px; font-weight: bold; color: #4f46e5; margin: 0; font-family: Arial, sans-serif;"></h1>
+                    <p id="pdfBizPhone" style="margin: 6px 0 0 0; color: #444; font-size: 14px; font-family: Arial, sans-serif;"></p>
                 </div>
                 <div style="text-align: right;">
-                    <h2 id="pdfDocType" style="font-size: 18px; font-weight: bold; margin: 0; text-transform: uppercase; color: #333;"></h2>
-                    <p style="margin: 5px 0 0 0; color: #777; font-size: 13px;">Ημερομηνία: <span id="pdfDate"></span></p>
+                    <h2 id="pdfDocType" style="font-size: 20px; font-weight: bold; margin: 0; text-transform: uppercase; color: #222; font-family: Arial, sans-serif;"></h2>
+                    <p style="margin: 6px 0 0 0; color: #666; font-size: 13px; font-family: Arial, sans-serif;">Ημερομηνία: <span id="pdfDate"></span></p>
                 </div>
             </div>
-            <div style="margin: 20px 0;">
-                <strong style="color: #333; font-size: 14px;">Προς τον Πελάτη:</strong>
-                <p id="pdfClientName" style="margin: 5px 0; font-size: 15px; font-weight: bold;"></p>
+            <div style="margin: 25px 0; font-family: Arial, sans-serif;">
+                <strong style="color: #444; font-size: 14px; text-transform: uppercase;">Προς τον Πελάτη:</strong>
+                <p id="pdfClientName" style="margin: 6px 0; font-size: 16px; font-weight: bold; color: #111;"></p>
             </div>
-            <table style="width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px;">
+            <table style="width: 100%; border-collapse: collapse; margin-top: 25px; font-size: 14px; font-family: Arial, sans-serif;">
                 <thead>
-                    <tr style="background-color: #f3f4f6; text-align: left;">
-                        <th style="padding: 10px; border-bottom: 2px solid #ddd;">Περιγραφή Εργασίας</th>
-                        <th style="padding: 10px; border-bottom: 2px solid #ddd; text-align: center; width: 60px;">Ποσ.</th>
-                        <th style="padding: 10px; border-bottom: 2px solid #ddd; text-align: right; width: 100px;">Τιμή</th>
+                    <tr style="background-color: #f8fafc; text-align: left;">
+                        <th style="padding: 12px 10px; border-bottom: 2px solid #e2e8f0; color: #334155; font-weight: bold;">Περιγραφή Εργασίας</th>
+                        <th style="padding: 12px 10px; border-bottom: 2px solid #e2e8f0; text-align: center; width: 60px; color: #334155; font-weight: bold;">Ποσ.</th>
+                        <th style="padding: 12px 10px; border-bottom: 2px solid #e2e8f0; text-align: right; width: 110px; color: #334155; font-weight: bold;">Τιμή</th>
                     </tr>
                 </thead>
                 <tbody id="pdfTableBody"></tbody>
             </table>
-            <div style="text-align: right; margin-top: 30px; font-size: 16px; font-weight: bold; border-top: 2px solid #333; padding-top: 10px;">
+            <div style="text-align: right; margin-top: 35px; font-size: 18px; font-weight: bold; border-top: 2px solid #1e293b; padding-top: 15px; color: #0f172a; font-family: Arial, sans-serif;">
                 Γενικό Σύνολο: <span id="pdfTotal"></span>
             </div>
         </div>
@@ -241,16 +241,13 @@
             document.getElementById('successModal').classList.remove('hidden');
         }
 
-        // ΔΙΟΡΘΩΜΕΝΗ ΛΕΙΤΟΥΡΓΙΑ PDF
         function downloadPDF() {
             const btn = document.getElementById('downloadPdfBtn');
             const data = currentDocumentData;
             
-            // Αλλαγή κειμένου στο κουμπί για να ξέρει ο χρήστης ότι επεξεργάζεται
             btn.innerText = "⏳ Παραγωγή PDF...";
             btn.disabled = true;
 
-            // Γέμισμα των στοιχείων στο template
             document.getElementById('pdfBizName').innerText = myBusiness.name || 'Επαγγελματίας';
             document.getElementById('pdfBizPhone').innerText = myBusiness.phone ? 'Τηλ: ' + myBusiness.phone : '';
             document.getElementById('pdfDocType').innerText = data.docType;
@@ -262,36 +259,34 @@
             data.items.forEach(item => {
                 tbody.innerHTML += `
                     <tr>
-                        <td style="padding: 10px; border-bottom: 1px solid #eee;">${item.name}</td>
-                        <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: center;">${item.qty}</td>
-                        <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: right;">${item.total}€</td>
+                        <td style="padding: 10px; border-bottom: 1px solid #edf2f7; color: #2d3748;">${item.name}</td>
+                        <td style="padding: 10px; border-bottom: 1px solid #edf2f7; text-align: center; color: #2d3748;">${item.qty}</td>
+                        <td style="padding: 10px; border-bottom: 1px solid #edf2f7; text-align: right; color: #2d3748; font-weight: 500;">${item.total}€</td>
                     </tr>
                 `;
             });
             document.getElementById('pdfTotal').innerText = data.total + '€';
 
-            // Επιλογή του στοιχείου
             const element = document.getElementById('pdfTemplate');
             
-            // Βελτιστοποιημένες ρυθμίσεις για να μην "κολλάει" ο browser του κινητού
             const opt = {
-                margin: [10, 10, 10, 10],
+                margin: [15, 15, 15, 15],
                 filename: `${data.docType}_${data.clientName.replace(/\s+/g, '_')}.pdf`,
-                image: { type: 'jpeg', quality: 0.95 },
+                image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { 
-                    scale: 1.5, // Ελαφρώς χαμηλότερο scale για ταχύτητα σε κινητά, αλλά παραμένει πεντακάθαρο
+                    scale: 2, 
                     useCORS: true,
-                    logging: false
+                    logging: false,
+                    letterRendering: true
                 },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
-            // Εκτέλεση με Promises για σωστό reset του κουμπιού
             html2pdf().set(opt).from(element).save().then(() => {
                 btn.innerText = "📥 Κατέβασμα PDF στο κινητό";
                 btn.disabled = false;
             }).catch((err) => {
-                console.error(err);
+                console.error("PDF Error: ", err);
                 alert("Υπήρξε ένα πρόβλημα κατά τη λήψη. Δοκιμάστε ξανά.");
                 btn.innerText = "📥 Κατέβασμα PDF στο κινητό";
                 btn.disabled = false;
